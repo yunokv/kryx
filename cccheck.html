@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CC Checker | Kryx</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+</head>
+<body class="bg-[#0f0f0f] text-white min-h-screen flex">
+
+  <!-- Hamburger toggle button -->
+  <button id="menu-btn"
+          class="fixed top-4 left-4 z-50 p-2 rounded bg-[#1a1a1a] border border-[#2a2a2a] focus:outline-none">
+    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
+
+<!-- Sidebar -->
+<aside id="sidebar"
+       class="fixed top-0 left-0 h-full w-64 bg-[#1a1a1a] border-r border-[#2a2a2a] flex flex-col
+              transform translate-x-0 transition-transform duration-300 ease-in-out z-40">
+  <div class="p-6 border-b border-[#2a2a2a] pl-16"> <!-- added pl-16 for left padding -->
+    <h1 class="text-3xl font-bold">Kryx</h1>
+  </div>
+  <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+    <a href="home.html" class="block px-4 py-2 rounded bg-purple-700">Dashboard</a>
+    <a href="bin.html" class="block px-4 py-2 rounded hover:bg-purple-700 transition">BIN Lookup</a>
+    <a href="gen.html" class="block px-4 py-2 rounded hover:bg-purple-700 transition">CC Generators</a>
+    <a href="fullz.html" class="block px-4 py-2 rounded hover:bg-purple-700 transition">Fullz Generator</a>
+    <a href="iplookup.html" class="block px-4 py-2 rounded hover:bg-purple-700 transition">IP Lookup</a>
+    <a href="cccheck.html" class="block px-4 py-2 rounded hover:bg-purple-700 transition">CC Checker</a>
+    <a href="#" onclick="logout()" class="block mt-10 px-4 py-2 text-red-500 hover:text-red-400 font-semibold">Logout</a>
+  </nav>
+</aside>
+
+
+  <!-- Overlay -->
+  <div id="overlay" class="fixed inset-0 bg-black/50 hidden z-30 md:hidden"></div>
+
+  <!-- Main content -->
+  <main id="main-content" class="flex-1 ml-64 p-8 overflow-auto transition-all duration-300 ease-in-out">
+    <h2 class="text-3xl font-bold mb-6">CC Checker</h2>
+
+    <textarea id="cc-input" rows="10" placeholder="Paste CCs here, one per line" class="w-full max-w-xl p-4 rounded bg-[#111] border border-[#333] text-white font-mono mb-4"></textarea>
+    <button id="check-cc-btn" class="px-6 py-2 bg-purple-700 rounded hover:bg-purple-800 transition">Check CCs</button>
+
+    <pre id="cc-result" class="mt-6 bg-[#111] p-4 rounded max-w-xl whitespace-pre-wrap border border-[#333]"></pre>
+  </main>
+
+  <script>
+    const menuBtn = document.getElementById('menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const mainContent = document.getElementById('main-content');
+
+    function setInitialSidebarState() {
+      if (window.innerWidth < 768) {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        mainContent.classList.remove('ml-64');
+      } else {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.add('hidden');
+        mainContent.classList.add('ml-64');
+      }
+    }
+
+    setInitialSidebarState();
+
+    window.addEventListener('resize', () => {
+      setInitialSidebarState();
+    });
+
+    function openSidebar() {
+      sidebar.classList.remove('-translate-x-full');
+      if (window.innerWidth < 768) {
+        overlay.classList.remove('hidden');
+      }
+      mainContent.classList.add('ml-64');
+    }
+
+    function closeSidebar() {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+      if (window.innerWidth >= 768) {
+        mainContent.classList.remove('ml-64');
+      }
+    }
+
+    menuBtn.addEventListener('click', () => {
+      if (sidebar.classList.contains('-translate-x-full')) {
+        openSidebar();
+      } else {
+        closeSidebar();
+      }
+    });
+
+    overlay.addEventListener('click', closeSidebar);
+
+    // Logout function
+    function logout() {
+      localStorage.clear();
+      window.location.href = "index.html";
+    }
+
+    // CC Check mockup
+    document.getElementById('check-cc-btn').addEventListener('click', () => {
+      const input = document.getElementById('cc-input').value.trim();
+      const resultBox = document.getElementById('cc-result');
+
+      if (!input) {
+        resultBox.textContent = "❌ Paste some CCs first.";
+        return;
+      }
+
+      const lines = input.split('\n').filter(Boolean);
+
+      // Just mock check: randomly approve or decline
+      const results = lines.map(cc => {
+        const status = Math.random() > 0.5 ? "Approved ✅" : "Declined ❌";
+        return `${cc} - ${status}`;
+      });
+
+      // Increment localStorage count for checked CCs
+      let checkCount = parseInt(localStorage.getItem("ccChecked") || "0");
+      localStorage.setItem("ccChecked", checkCount + lines.length);
+
+      resultBox.textContent = results.join('\n');
+    });
+  </script>
+</body>
+</html>
