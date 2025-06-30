@@ -1,88 +1,24 @@
-// Premade login accounts
+import bcrypt from 'bcryptjs';
+
 const users = [
-  { username: "user", password: "pass" },
-  { username: "user2", password: "pass2" },
-  { username: "user3", password: "pass3" },
-  { username: "admin", password: "admin" } // Just another user now
+  // bcrypt hashes for passwords: 'pass', 'pass2', 'pass3', 'admin'
+  { username: "user", passwordHash: "$2a$10$O6J1H2/VuEMiHX3Nmo0N/uIH5zZc3OmM71vtfC63d0S7JYwTQWWeW" },
+  { username: "user2", passwordHash: "$2a$10$7N0txbHhrNmv6D0LUyb2WO9eFihP5mITfFg3bXLyXAV0LncaJVLme" },
+  { username: "user3", passwordHash: "$2a$10$P46V4Sxv8kaWntG/iSZ7FOUkyKps05vGqQlOwGn6s3QaEB3Tpi6Rm" },
+  { username: "admin", passwordHash: "$2a$10$5dkBqV0q5W0nLhIGYbVUs.yhGVpZbzKxsjM0g05Aq5WyixMJX4nX6" }
 ];
 
-// Handle login
-document.addEventListener("DOMContentLoaded", () => {
-  const loginForm = document.getElementById("login-form");
-  if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
-      e.preventDefault();
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: "Only POST allowed" });
 
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
+  const { username, password } = req.body || {};
+  if (!username || !password) return res.status(400).json({ error: "Username and password required" });
 
-      const matched = users.find(user => user.username === username && user.password === password);
+  const user = users.find(u => u.username === username);
+  if (!user) return res.status(401).json({ error: "Invalid username or password" });
 
-      if (matched) {
-        // Save current user (if you wanna use later, like show their name)
-        localStorage.setItem("username", username);
+  const match = await bcrypt.compare(password, user.passwordHash);
+  if (!match) return res.status(401).json({ error: "Invalid username or password" });
 
-        // Redirect to home
-        window.location.href = "home.html";
-      } else {
-        alert("❌ Invalid username or password.");
-      }
-    });
-  }
-});
-
-// Logout function
-function logout() {
-  localStorage.clear();
-  window.location.href = "index.html";
+  return res.status(200).json({ message: "Login successful", username });
 }
-
-const menuBtn = document.getElementById('menu-btn');
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('overlay');
-const mainContent = document.getElementById('main-content');
-
-// Start with sidebar open on desktop, closed on mobile
-function setInitialSidebarState() {
-  if (window.innerWidth < 768) {
-    sidebar.classList.add('-translate-x-full');
-    overlay.classList.add('hidden');
-    mainContent.classList.remove('ml-64');
-  } else {
-    sidebar.classList.remove('-translate-x-full');
-    overlay.classList.add('hidden');
-    mainContent.classList.add('ml-64');
-  }
-}
-
-setInitialSidebarState();
-
-window.addEventListener('resize', () => {
-  setInitialSidebarState();
-});
-
-function openSidebar() {
-  sidebar.classList.remove('-translate-x-full');
-  if (window.innerWidth < 768) {
-    overlay.classList.remove('hidden');
-  }
-  mainContent.classList.add('ml-64');
-}
-
-function closeSidebar() {
-  sidebar.classList.add('-translate-x-full');
-  overlay.classList.add('hidden');
-  if (window.innerWidth >= 768) {
-    mainContent.classList.remove('ml-64');
-  }
-}
-
-menuBtn.addEventListener('click', () => {
-  if (sidebar.classList.contains('-translate-x-full')) {
-    openSidebar();
-  } else {
-    closeSidebar();
-  }
-});
-
-overlay.addEventListener('click', closeSidebar);
