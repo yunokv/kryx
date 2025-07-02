@@ -3,7 +3,8 @@ const users = [
   { username: "user", password: "pass" },
   { username: "user2", password: "pass2" },
   { username: "user3", password: "pass3" },
-  { username: "admin", password: "admin" } // Just another user now
+  { username: "admin", password: "admin" },
+  { username: "Rigbty", password: "DmtDrone12" },
 ];
 
 // Handle login
