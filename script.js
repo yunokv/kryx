@@ -7,11 +7,20 @@ const users = [
   { username: "Rigbty", password: "DmtDrone12" },
 ];
 
+// Log login info to Discord webhook
+async function logLogin(username) {
+  await fetch('/api/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username }),
+  });
+}
+
 // Handle login
 document.addEventListener("DOMContentLoaded", () => {
   const loginForm = document.getElementById("login-form");
   if (loginForm) {
-    loginForm.addEventListener("submit", function (e) {
+    loginForm.addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const username = document.getElementById("username").value.trim();
@@ -20,10 +29,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const matched = users.find(user => user.username === username && user.password === password);
 
       if (matched) {
-        // Save current user (if you wanna use later, like show their name)
+        // Log the login
+        await logLogin(username);
+
+        // Save current user (for later use)
         localStorage.setItem("username", username);
 
-        // Redirect to home
+        // Redirect to home page
         window.location.href = "home.html";
       } else {
         alert("❌ Invalid username or password.");
@@ -38,12 +50,12 @@ function logout() {
   window.location.href = "index.html";
 }
 
+// Sidebar menu handling (kept as you had it)
 const menuBtn = document.getElementById('menu-btn');
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 const mainContent = document.getElementById('main-content');
 
-// Start with sidebar open on desktop, closed on mobile
 function setInitialSidebarState() {
   if (window.innerWidth < 768) {
     sidebar.classList.add('-translate-x-full');
