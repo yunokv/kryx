@@ -17,7 +17,7 @@ export default async function handler(req, res) {
   const time = new Date().toISOString();
 
   const message = `User: ${username}\nIP: ${ip}\nTime: ${time}`;
-  const webhookUrl = 'https://discord.com/api/webhooks/1390583753449148427/sOht4kjORjRTDEjpmo7QWtk9C0RpJPnC40CIXLRByeJNTK7z3bb4y41fyLxFlrBkE-cJ';
+  const webhookUrl = '';
 
   try {
     await fetch(webhookUrl, {
